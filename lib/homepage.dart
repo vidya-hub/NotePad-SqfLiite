@@ -37,16 +37,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // void initState() {
-  //   setState(() {
-  //         notesCards.clear();
-  //       });
+  void initState() {
+    setState(() {
+      getData();
+      // notesCards.clear();
+    });
 
-  //   super.initState();
-  // }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    getData();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -76,13 +77,16 @@ class _HomePageState extends State<HomePage> {
 
                   // var keyValue = notesValues[index];
                   return Dismissible(
-                    key: Key(item.toString()),
+                    key: ValueKey(item),
                     onDismissed: (direction) {
-                      // print(direction);
-                      // Remove the item from the data source.
                       setState(() {
                         notesCards.removeAt(index);
+                        // notesList.removeAt(index);
+                        // getData();
                         dbHelper.deleteData(notesList[index]["id"]);
+                        // setState(() {
+                        //   notesList.removeAt(index);
+                        // });
                         // notesList.removeAt(index);
                         // items.removeAt(index);
                       });
@@ -130,7 +134,10 @@ class CardWIds extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    notevalue["content"],
+                    notevalue["content"].toString().length >= 40
+                        ? notevalue["content"].toString().substring(0, 10) +
+                            "............"
+                        : notevalue["content"],
                     style: TextStyle(fontSize: 20),
                   ),
                   Text(DateFormat("yyyy-MM-dd hh:mm")
