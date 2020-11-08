@@ -74,21 +74,13 @@ class _HomePageState extends State<HomePage> {
                     crossAxisCount: 2),
                 itemBuilder: (BuildContext context, int index) {
                   var item = notesCards[index];
-
-                  // var keyValue = notesValues[index];
                   return Dismissible(
                     key: ValueKey(item),
                     onDismissed: (direction) {
                       setState(() {
                         notesCards.removeAt(index);
-                        // notesList.removeAt(index);
-                        // getData();
                         dbHelper.deleteData(notesList[index]["id"]);
-                        // setState(() {
-                        //   notesList.removeAt(index);
-                        // });
-                        // notesList.removeAt(index);
-                        // items.removeAt(index);
+
                       });
                     },
                     child: notesCards[index],
