@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                       setState(() {
                         notesCards.removeAt(index);
                         dbHelper.deleteData(notesList[index]["id"]);
-
+                        getData();
                       });
                     },
                     child: notesCards[index],
