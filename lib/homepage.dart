@@ -1,3 +1,4 @@
+import 'package:NotePad/cardwids.dart';
 import 'package:NotePad/content.dart';
 import 'package:NotePad/dbmodel.dart';
 import 'package:NotePad/editnotes.dart';
@@ -42,10 +43,30 @@ class _HomePageState extends State<HomePage> {
       getData();
       // notesCards.clear();
     });
-
+    // timerValues();
     super.initState();
   }
 
+  timerValues(int index) {
+    setState(() {
+      deletion = true;
+    });
+    Future.delayed(Duration(seconds: 4)).then((value) {
+      setState(() {
+        // notesCards.removeAt(index);
+        if (deletion == true) {
+          dbHelper.deleteData(notesList[index]["id"]);
+          getData();
+        }
+        deletion = false;
+      });
+    });
+    // print("Completed");
+    // return Null;
+  }
+
+  bool deletion = false;
+  Map<int, Widget> deletedCard = {};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,79 +86,95 @@ class _HomePageState extends State<HomePage> {
           }));
         },
       ),
-      body: Container(
-        child: notesCards.length == 0
-            ? Center(child: EmptyCards())
-            : GridView.builder(
-                itemCount: notesCards.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  var item = notesCards[index];
-                  return Dismissible(
-                    key: ValueKey(item),
-                    onDismissed: (direction) {
-                      setState(() {
-                        notesCards.removeAt(index);
-                        dbHelper.deleteData(notesList[index]["id"]);
-                        getData();
-                      });
-                    },
-                    child: notesCards[index],
-                  );
-                },
+      body: SafeArea(
+        child: Center(
+          child: Stack(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                child: notesCards.length == 0
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          EmptyCards(),
+                        ],
+                      )
+                    : GridView.builder(
+                        itemCount: notesCards.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                        itemBuilder: (BuildContext context, int index) {
+                          var item = notesCards[index];
+                          return Dismissible(
+                            key: ValueKey(item),
+                            onDismissed: (direction) {
+                              setState(() {
+                                deletedCard.clear();
+                                deletedCard[index] = notesCards[index];
+                                notesCards.removeAt(index);
+                                // dbHelper.deleteData(notesList[index]["id"]);
+                                // getData();
+                              });
+                              timerValues(index);
+                            },
+                            child: notesCards[index],
+                          );
+                        },
+                      ),
               ),
-      ),
-    );
-  }
-}
-
-class CardWIds extends StatelessWidget {
-  CardWIds({
-    @required this.notevalue,
-  });
-
-  var notevalue;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // print(notesValues[index]["id"]);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return EditNotes(
-                initialvalue: notevalue,
-              );
-            },
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          elevation: 6,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // SizedBox(height: MediaQuery.of(context).size.height/2,),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    notevalue["content"].toString().length >= 40
-                        ? notevalue["content"].toString().substring(0, 10) +
-                            "............"
-                        : notevalue["content"],
-                    style: TextStyle(fontSize: 20),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    // padding: EdgeInsets.symmetric(vertical:90),
+                    child: deletion
+                        ? Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 80.0, vertical: 60),
+                            child: Card(
+                              elevation: 6,
+                              borderOnForeground: true,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    "Deleting.......",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        deletion = false;
+                                        notesCards.insert(
+                                            deletedCard.keys.single,
+                                            deletedCard.values.single);
+                                        getData();
+                                      });
+                                    },
+                                    child: Text(
+                                      "Undo",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.blue),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(),
                   ),
-                  Text(DateFormat("yyyy-MM-dd hh:mm")
-                      .parse(notevalue["date"])
-                      .toString())
                 ],
-              ),
-            ),
+              )
+            ],
           ),
         ),
       ),
