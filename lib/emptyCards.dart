@@ -5,9 +5,16 @@ class EmptyCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      child: Text(
+      child:
+          // Icon(
+          //   Icons.hourglass_empty_sharp,
+          //   color: Colors.white,
+          //   size: 60,
+          // ),
+          Text(
         "There is Nothing Here",
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
   }
